@@ -2,7 +2,7 @@
   "name": "PEPNetworking",
   "version": "0.1.0",
   "summary": "A networking framework based on AFNetworking",
-  "homepage": "https://github.com/PEPDigitalPublishing/PEPNetworking.git",
+  "homepage": "https://github.com/PEPDigitalPublishing/PEPNetworking",
   "license": {
     "type": "MIT",
     "file": "LICENSE"

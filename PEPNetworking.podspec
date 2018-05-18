@@ -9,7 +9,7 @@ s.version          = '0.1.0'
 
 s.summary          = 'A networking framework based on AFNetworking'
 
-s.homepage         = 'https://github.com/PEPDigitalPublishing/PEPNetworking.git'
+s.homepage         = 'https://github.com/PEPDigitalPublishing/PEPNetworking'
 
 s.license          = { :type => 'MIT', :file => 'LICENSE' }
 

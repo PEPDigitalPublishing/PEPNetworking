@@ -1,0 +1,14 @@
+platform :ios, '7.0'
+
+use_frameworks!
+
+target 'PEPNetworking_Example' do
+  pod 'PEPNetworking', :path => '../'
+
+  target 'PEPNetworking_Tests' do
+    inherit! :search_paths
+
+    
+  end
+  
+end

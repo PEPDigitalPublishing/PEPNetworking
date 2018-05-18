@@ -22,8 +22,10 @@ pod 'PEPNetworking'
 
 ## Author
 
-RavenKite, lipeizhuo0528@outlook.com
+Karl, renk@pep.com.cn
 
 ## License
 
 PEPNetworking is available under the MIT license. See the LICENSE file for more info.
+
+

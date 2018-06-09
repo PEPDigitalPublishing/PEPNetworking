@@ -42,12 +42,14 @@ NSString *const PEPDownloadCompletionErrorKey = @"kPEPDownloadCompletionErrorKey
 - (void)dealloc
 {
     [self clearBlocks];
+    [_item removeObserver:self forKeyPath:@"status"];
 }
 
 - (instancetype)initWithItem:(PEPDownloadItem *)item
 {
     if (self = [super init]) {
         _item = item;
+        [_item addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionOld|NSKeyValueObservingOptionNew context:nil];
     }
     return self;
 }
@@ -98,12 +100,21 @@ NSString *const PEPDownloadCompletionErrorKey = @"kPEPDownloadCompletionErrorKey
     [[PEPDownloadQueue sharedQueue] removeDownload:self];
 }
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context{
+    if ([keyPath isEqualToString:@"status"]) {
+        if (self.statusChangedBlock) {
+            self.statusChangedBlock(_item.status);
+        }
+    }
+}
+
 #pragma mark -
 
 - (void)clearBlocks
 {
     self.completionBlock = nil;
     self.progressBlock = nil;
+    self.statusChangedBlock = nil;
 }
 
 @end

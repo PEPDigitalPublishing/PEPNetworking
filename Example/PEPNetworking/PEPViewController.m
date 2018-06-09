@@ -10,7 +10,8 @@
 #import <PEPNetworking/PEPNetworking.h>
 
 @interface PEPViewController ()
-
+@property (weak, nonatomic) IBOutlet UIProgressView *progress;
+@property (nonatomic, strong) PEPDownloadOperation *downlaodOperation;
 @end
 
 @implementation PEPViewController
@@ -23,7 +24,7 @@
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     [self checkStatus];
-    [self request];
+//    [self request];
 //    [self download];
 //    [self upload];
     
@@ -63,24 +64,7 @@
 
 - (void)download{
     
-    NSString *savePath = [NSString stringWithFormat:@"%@/Library/Caches/textbook.zip",NSHomeDirectory()];
-    PEPDownloadOperation *operation = [PEPDownloadAgent downloadWithDownloadPath:@"http://192.168.186.8:8088/pub_cloud/02/1211001101051/1211001101051.zip" savePath:savePath progress:^(NSProgress *downloadProgress) {
-        CGFloat percentage = 100.00 * downloadProgress.completedUnitCount / downloadProgress.totalUnitCount;
-        NSLog(@"%f%%",percentage);
-    } success:^(NSURL *filePath) {
-        NSLog(@"%@",filePath);
-    } fail:^(NSError *error) {
-        NSLog(@"%@",error.localizedDescription);
-    }];
     
-    //暂停下载
-    //    [operation pauseDownload];
-    
-    //启动或继续下载
-    [operation startDownload];
-    
-    //取消下载
-    //    [operation finishDownload];
 }
 
 - (void)upload
@@ -117,6 +101,52 @@
     
     
 }
+- (IBAction)cancelDownlaodAction:(id)sender {
+    if (_downlaodOperation) {
+        [_downlaodOperation finishDownload];
+    }
+}
+- (IBAction)continueDownloadAction:(id)sender {
+    if (_downlaodOperation) {
+        [_downlaodOperation startDownload];
+    }
+    
+}
+- (IBAction)pauseDownloadAction:(id)sender {
+    if (_downlaodOperation) {
+        [_downlaodOperation pauseDownload];
+    }
+    
+}
+- (IBAction)downloadAction:(id)sender {
+    NSString *savePath = [NSString stringWithFormat:@"%@/Library/Caches/textbook.zip",NSHomeDirectory()];
+    _downlaodOperation = [PEPDownloadAgent downloadWithDownloadPath:@"https://github.com/NPW-Project/NewPowerCoin/releases/download/v1.0.0.0/npw-1.0.0-osx-high-sierra-only-unsigned.dmg" savePath:savePath progress:^(NSProgress *downloadProgress) {
+        _progress.progress = (CGFloat)downloadProgress.completedUnitCount / downloadProgress.totalUnitCount;
+    } success:^(NSURL *filePath) {
+        NSLog(@"%@",filePath);
+    } fail:^(NSError *error) {
+        NSLog(@"%@",error.localizedDescription);
+    }];
+    
+    _downlaodOperation.statusChangedBlock = ^(PEPDownloadStatus status) {
+        NSLog(@"downloadStatusChanged ==== %ld",status);
+    };
+    
+    
+    
+    //启动
+    [_downlaodOperation startDownload];
+}
+- (IBAction)getAction:(id)sender {
+    [self request];
+    
+}
+- (IBAction)postAction:(id)sender {
+
+
+}
+
+
 
 
 @end

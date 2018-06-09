@@ -42,12 +42,15 @@ typedef void(^PEPDownloadProgressBlock)(NSProgress *progress);
 /** Block of file download completion. */
 typedef void(^PEPDownloadCompletionBlock)(NSURL *filePath, NSError *error);
 
+/** Block of download status*/
+typedef void(^PEPDownloadStatusChangedBlock)(PEPDownloadStatus status);
 /** Download operation Class. */
 @interface PEPDownloadOperation : NSObject
 
 @property (nonatomic, strong, readonly) PEPDownloadItem *item;
 @property (nonatomic, copy, readonly) PEPDownloadProgressBlock progressBlock;
 @property (nonatomic, copy, readonly) PEPDownloadCompletionBlock completionBlock;
+@property (nonatomic, copy) PEPDownloadStatusChangedBlock statusChangedBlock;
 
 /** Instance of PEPDownloadOperation with item. */
 + (instancetype)operationWithItem:(PEPDownloadItem *)item;

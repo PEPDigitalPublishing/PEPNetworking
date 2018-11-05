@@ -45,7 +45,8 @@ static NSMutableArray *requestTasksArray;
     
     manager.requestSerializer = [AFHTTPRequestSerializer serializer];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
-    
+    manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+
     AFJSONResponseSerializer *serializer = [AFJSONResponseSerializer serializer];
     [serializer setRemovesKeysWithNullValues: NO];
     manager.requestSerializer.stringEncoding = NSUTF8StringEncoding;

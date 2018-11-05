@@ -232,6 +232,8 @@ static dispatch_queue_t PEP_download_agent_file_operation_queue() {
 
 - (NSString *)resumeDataPath:(PEPDownloadItem *)downloadItem
 {
+    if (downloadItem == nil || downloadItem.downloadId.length == 0) { return @""; }
+
     NSString *key = [self downloadKey:downloadItem];
     NSString *resumeDataName = [NSString stringWithFormat:@"%@_resumeData", key];
     NSString *resumeDataPath = [PEPDownloadUtilities filePathWithFileName:resumeDataName

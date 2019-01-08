@@ -54,7 +54,7 @@ static NSString *const cacheDirKey = @"pepnetworkingdiskcachedirectorykey";
         NSString *directoryPath = nil;
         directoryPath = [[NSUserDefaults standardUserDefaults] objectForKey:cacheDirKey];
         if (!directoryPath) {
-            directoryPath = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)[0] stringByAppendingPathComponent:@"PEPNetworking"] stringByAppendingPathComponent:@"networkCache"];
+            directoryPath = [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0] stringByAppendingPathComponent:@"PEPNetworking"] stringByAppendingPathComponent:@"networkCache"];
             [[NSUserDefaults standardUserDefaults] setObject:directoryPath forKey:cacheDirKey];
             [[NSUserDefaults standardUserDefaults] synchronize];
         }

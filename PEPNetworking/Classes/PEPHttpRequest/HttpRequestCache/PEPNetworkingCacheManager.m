@@ -16,7 +16,12 @@ static NSUInteger disCacheCapacity = 30 * 1024 * 1024;
 //默认缓存时间-7天
 static NSTimeInterval cacheTime = 7 * 24 * 60 * 60;
 
-static NSString *const cacheDirKey = @"pepnetworkingdiskcachedirectorykey";
+@interface PEPNetworkingCacheManager()
+
+@property (nonatomic, copy) NSString *cacheDirectory;
+
+@end
+
 @implementation PEPNetworkingCacheManager
 
 + (PEPNetworkingCacheManager *)sharedManager{
@@ -50,15 +55,9 @@ static NSString *const cacheDirKey = @"pepnetworkingdiskcachedirectorykey";
     if (!error) {
         //缓存到内存
         [PEPNetworkingMemoryCache writeData:responseObject forKey:md5Sting];
+        
         //缓存到磁盘
-        NSString *directoryPath = nil;
-        directoryPath = [[NSUserDefaults standardUserDefaults] objectForKey:cacheDirKey];
-        if (!directoryPath) {
-            directoryPath = [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES)[0] stringByAppendingPathComponent:@"PEPNetworking"] stringByAppendingPathComponent:@"networkCache"];
-            [[NSUserDefaults standardUserDefaults] setObject:directoryPath forKey:cacheDirKey];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        }
-        [PEPNetworkingDiskCache writeData:data toDirectory:directoryPath fileName:md5Sting];
+        [PEPNetworkingDiskCache writeData:data toDirectory:self.cacheDirectory fileName:md5Sting];
         [[PEPLRUManager sharedManager] addFileNode:md5Sting];
     }
 }
@@ -74,13 +73,11 @@ static NSString *const cacheDirKey = @"pepnetworkingdiskcachedirectorykey";
     //先从内存中找
     cachedData = [PEPNetworkingMemoryCache readDataWithKey:md5String];
     if (!cachedData) {
-        NSString *directoryPath = [[NSUserDefaults standardUserDefaults] objectForKey:cacheDirKey];
-        if (directoryPath) {
-            cachedData = [PEPNetworkingDiskCache readDataFromDirectory:directoryPath fileName:md5String];
-            if (cachedData) {
-                //刷新磁盘缓存队列
-                [[PEPLRUManager sharedManager] refreshIndexOfFileName:md5String];
-            }
+        
+        cachedData = [PEPNetworkingDiskCache readDataFromDirectory:self.cacheDirectory fileName:md5String];
+        if (cachedData) {
+            //刷新磁盘缓存队列
+            [[PEPLRUManager sharedManager] refreshIndexOfFileName:md5String];
         }
     }
     if ([cachedData isKindOfClass:[NSData class]]) {
@@ -90,27 +87,23 @@ static NSString *const cacheDirKey = @"pepnetworkingdiskcachedirectorykey";
 }
 
 - (NSUInteger)totalCachedSize{
-    NSString *directoryPath = [[NSUserDefaults standardUserDefaults] objectForKey:cacheDirKey];
-    return [PEPNetworkingDiskCache dataSizeAtDirectory:directoryPath];
+    return [PEPNetworkingDiskCache dataSizeAtDirectory:self.cacheDirectory];
 }
 
 - (NSString *)getCacheDiretoryPath {
-    NSString *directoryPath = [[NSUserDefaults standardUserDefaults] objectForKey:cacheDirKey];
-    return directoryPath;
+    return self.cacheDirectory;
 }
 
 - (void)clearTotalCache{
-    NSString *directoryPath = [[NSUserDefaults standardUserDefaults] objectForKey:cacheDirKey];
-    [PEPNetworkingDiskCache clearDataAtDirectory:directoryPath];
+    [PEPNetworkingDiskCache clearDataAtDirectory:self.cacheDirectory];
 }
 
 - (void)clearLRUCache{
     if ([self totalCachedSize] > disCacheCapacity) {
         NSArray *filesToDelete = [[PEPLRUManager sharedManager] removeLRUFileNodeWithCacheTime:cacheTime];
-        NSString *directoryPath = [[NSUserDefaults standardUserDefaults] objectForKey:cacheDirKey];
-        if (directoryPath && filesToDelete.count) {
+        if (filesToDelete.count) {
             [filesToDelete enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-                NSString *filepath = [directoryPath stringByAppendingPathComponent:obj];
+                NSString *filepath = [self.cacheDirectory stringByAppendingPathComponent:obj];
                 [PEPNetworkingDiskCache deleteCacheAtPath:filepath];
             }];
         }
@@ -132,4 +125,21 @@ static NSString *const cacheDirKey = @"pepnetworkingdiskcachedirectorykey";
     
     return [ms copy];
 }
+
+- (NSString *)cacheDirectory {
+    if (!_cacheDirectory) {
+        NSString *sysCacheDir = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
+        NSString *cacheDirectory = [sysCacheDir stringByAppendingPathComponent:@"PEPNetworking/networkCache"];
+        
+        if (![NSFileManager.defaultManager fileExistsAtPath:cacheDirectory isDirectory:nil]) {
+            NSError *error = nil;
+            [NSFileManager.defaultManager createDirectoryAtPath:cacheDirectory withIntermediateDirectories:true attributes:nil error:&error];
+            if (error) { NSLog(@"createDirectory error is %@",error.localizedDescription); }
+        }
+        
+        _cacheDirectory = cacheDirectory;
+    }
+    return _cacheDirectory;
+}
+
 @end

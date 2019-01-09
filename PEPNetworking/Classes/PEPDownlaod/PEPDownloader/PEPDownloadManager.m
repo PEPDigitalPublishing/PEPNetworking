@@ -121,7 +121,7 @@ static dispatch_queue_t PEP_download_agent_file_operation_queue() {
         return;
     }
     
-    NSString *key = [self downloadKey:operation.item];
+    NSString *key = [self downloadKey:operation.item] ? : @"";
     NSURLSessionDownloadTask *requestTask = self.tasksDict[key];
     if ([requestTask respondsToSelector:@selector(cancel)]) {
         [requestTask cancel];

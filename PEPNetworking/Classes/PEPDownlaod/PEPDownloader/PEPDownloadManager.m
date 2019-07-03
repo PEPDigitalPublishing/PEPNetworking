@@ -359,13 +359,31 @@ static dispatch_queue_t PEP_download_agent_file_operation_queue() {
 /** Download temp file path. */
 - (NSString *)tempFilePathWithResumeDictionary:(NSDictionary *)resumeDictionary
 {
-    if (resumeDictionary.count < 1) {
-        return nil;
-    }
+    if (resumeDictionary.count < 1) { return nil; }
+    
     NSString *tempFileName = [resumeDictionary objectForKey:@"NSURLSessionResumeInfoTempFileName"];
-    if (tempFileName.length < 1) {
-        return nil;
+    
+    if (@available(iOS 12.0, *)) {  // iOS 12 resumeData数据结构改变，用以下方式获取到缓存文件名
+        if (tempFileName.length == 0) {
+            id ary = resumeDictionary[@"$objects"];
+            if (![ary isKindOfClass:NSArray.class]) { return nil; }
+            
+            NSArray *objAry = (NSArray *)ary;
+            for (id obj in objAry) {
+                if ([obj isKindOfClass:NSString.class]) {
+                    NSString *str = (NSString *)obj;
+                    
+                    if ([str hasSuffix:@".tmp"]) {
+                        tempFileName = str;
+                        break;
+                    }
+                }
+            }
+        }
     }
+    
+    if (tempFileName.length < 1) { return nil; }
+    
     return [NSTemporaryDirectory() stringByAppendingPathComponent:tempFileName];
 }
 

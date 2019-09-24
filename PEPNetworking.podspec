@@ -3,30 +3,32 @@
 
 Pod::Spec.new do |s|
 
-s.name             = 'PEPNetworking'
+    s.name             = 'PEPNetworking'
 
-s.version          = '0.2.5'
+    s.version          = '0.3.0'
 
-s.summary          = 'A networking framework based on AFNetworking'
+    s.summary          = 'A networking framework based on AFNetworking'
 
-s.homepage         = 'https://github.com/PEPDigitalPublishing/PEPNetworking'
+    s.homepage         = 'https://github.com/PEPDigitalPublishing/PEPNetworking'
 
-s.license          = { :type => 'MIT', :file => 'LICENSE' }
+    s.license          = { :type => 'MIT', :file => 'LICENSE' }
 
-s.author           = { 'Karl' => 'renk@pep.com.cn' }
+    s.author           = { 'Karl' => 'renk@pep.com.cn' }
 
-s.source           = { :git => 'https://github.com/PEPDigitalPublishing/PEPNetworking.git', :tag => s.version.to_s }
+    s.source           = { :git => 'https://github.com/PEPDigitalPublishing/PEPNetworking.git', :tag => s.version.to_s }
 
-s.ios.deployment_target = '7.0'
+    s.ios.deployment_target = '8.0'
 
-s.source_files = 'PEPNetworking/Classes/**/*.{h,m}'
+    s.source_files = 'PEPNetworking/Classes/**/*.{h,m}'
 
-s.public_header_files = 'PEPNetworking/Classes/**/*.h'
+    s.public_header_files = 'PEPNetworking/Classes/**/*.h'
 
-s.frameworks = 'UIKit', 'Foundation'
+    s.frameworks = 'UIKit', 'Foundation'
 
-s.dependency 'AFNetworking', '~> 3.0'
-
+    s.dependency 'AFNetworking', '~> 3.0'
+    
+    s.dependency 'PEPBigData'
+    
 end
 
 

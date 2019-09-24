@@ -1,14 +1,29 @@
-platform :ios, '7.0'
+platform :ios, '8.0'
 
-use_frameworks!
+inhibit_all_warnings!
+
+#use_frameworks!
+
+workspace 'Example/PEPNetworking.xcworkspace'
+
 
 target 'PEPNetworking_Example' do
   pod 'PEPNetworking', :path => '../'
+  
+#  pod 'PEPBigData', :git => 'https://github.com/PEPDigitalPublishing/PEPBigData.git'
 
   target 'PEPNetworking_Tests' do
     inherit! :search_paths
 
-    
   end
   
+end
+
+target 'PEPNetworking' do
+  project 'Pods/Pods.xcodeproj'
+  
+  pod 'AFNetworking'
+  
+  pod 'PEPBigData', :git => 'https://github.com/PEPDigitalPublishing/PEPBigData.git'
+
 end

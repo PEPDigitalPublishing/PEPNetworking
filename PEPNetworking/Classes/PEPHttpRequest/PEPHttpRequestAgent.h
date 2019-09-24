@@ -52,6 +52,27 @@ typedef void(^PEPResponseFailBlock) (NSError *error);
 
 
 /**
+ 异步get请求. 使用AFHTTPResponseSerializer类解析
+ 
+ @param url             请求地址
+ @param params          请求参数
+ @param refresh         是否刷新请求，是的话，有相同请求会先取消旧请求使用新请求
+ @param useCache        是否使用缓存，是的话，先查找本地缓存，并缓存新的数据
+ @param progressBlock   进度回调
+ @param successBlock    成功回调
+ @param failBlock       失败回调
+ @return                返回请求任务
+ */
++ (NSURLSessionTask *)getHTTPResponderWithUrl:(NSString *)url
+                                       params:(NSDictionary *)params
+                               refreshRequest:(BOOL)refresh
+                                     useCache:(BOOL)useCache
+                                progressBlock:(PEPProgressBlock)progressBlock
+                                 successBlock:(PEPResponseSuccessBlock)successBlock
+                                    failBlock:(PEPResponseFailBlock)failBlock;
+
+
+/**
  异步post请求
  
  @param url             请求地址
@@ -70,6 +91,29 @@ typedef void(^PEPResponseFailBlock) (NSError *error);
                     progressBlock:(PEPProgressBlock)progressBlock
                      successBlock:(PEPResponseSuccessBlock)successBlock
                         failBlock:(PEPResponseFailBlock)failBlock;
+
+
+/**
+异步post请求. 使用AFHTTPResponseSerializer类解析
+
+@param url             请求地址
+@param params          请求参数
+@param refresh         是否刷新请求，是的话，有相同请求会先取消旧请求使用新请求
+@param useCache        是否使用缓存，是的话，先查找本地缓存，并缓存新的数据
+@param progressBlock   进度回调
+@param successBlock    成功回调
+@param failBlock       失败回调
+@return                返回请求任务
+*/
++ (NSURLSessionTask *)postHTTPResponderWithUrl:(NSString *)url
+                                       params:(NSDictionary *)params
+                                refreshRequest:(BOOL)refresh
+                                      useCache:(BOOL)useCache
+                                 progressBlock:(PEPProgressBlock)progressBlock
+                                  successBlock:(PEPResponseSuccessBlock)successBlock
+                                     failBlock:(PEPResponseFailBlock)failBlock;
+
+
 
 @end
 

@@ -8,11 +8,13 @@
 
 #import "PEPAppDelegate.h"
 
+#import <PEPBigData/PEPBigData.h>
+
 @implementation PEPAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
+    [PEPLoggingInstance setupWithConfiguration:nil appId:@"11120101" accessKey:@"110000006" writeFlag:YES];// 初始化日志收集
     return YES;
 }
 

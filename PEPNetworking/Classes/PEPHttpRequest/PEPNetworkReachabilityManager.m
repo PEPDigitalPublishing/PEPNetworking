@@ -10,7 +10,7 @@
 
 @implementation PEPNetworkReachabilityManager
 
-+ (instancetype)sharedManager{
++ (instancetype)sharedManager {
     static PEPNetworkReachabilityManager *_sharedManager = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -44,13 +44,8 @@
                 break;
             }
         }
-        
-        if (self.status == pStatus) { return; }
-        
+                
         self.status = pStatus;
-        if (self.statusChangeBlock) {
-            self.statusChangeBlock(pStatus);
-        }
     }];
 }
 

@@ -24,9 +24,10 @@
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     [self checkStatus];
-//    [self request];
+    [self request];
 //    [self download];
 //    [self upload];
+    
     
 }
 
@@ -62,8 +63,7 @@
     
 }
 
-- (void)download{
-    
+- (void)download {
     
 }
 
@@ -120,22 +120,23 @@
 }
 - (IBAction)downloadAction:(id)sender {
     NSString *savePath = [NSString stringWithFormat:@"%@/Library/Caches/textbook.zip",NSHomeDirectory()];
-    _downlaodOperation = [PEPDownloadAgent downloadWithDownloadPath:@"https://github.com/NPW-Project/NewPowerCoin/releases/download/v1.0.0.0/npw-1.0.0-osx-high-sierra-only-unsigned.dmg" savePath:savePath progress:^(NSProgress *downloadProgress) {
-        _progress.progress = (CGFloat)downloadProgress.completedUnitCount / downloadProgress.totalUnitCount;
+    
+    __weak typeof(self) weakself = self;
+    self.downlaodOperation = [PEPDownloadAgent downloadWithDownloadPath:@"https://github.com/NPW-Project/NewPowerCoin/releases/download/v1.0.0.0/npw-1.0.0-osx-high-sierra-only-unsigned.dmg" savePath:savePath progress:^(NSProgress *downloadProgress) {
+        weakself.progress.progress = (CGFloat)downloadProgress.completedUnitCount / downloadProgress.totalUnitCount;
     } success:^(NSURL *filePath) {
         NSLog(@"%@",filePath);
     } fail:^(NSError *error) {
         NSLog(@"%@",error.localizedDescription);
     }];
     
-    _downlaodOperation.statusChangedBlock = ^(PEPDownloadStatus status) {
+    self.downlaodOperation.statusChangedBlock = ^(PEPDownloadStatus status) {
         NSLog(@"downloadStatusChanged ==== %ld",status);
     };
     
     
-    
     //启动
-    [_downlaodOperation startDownload];
+    [self.downlaodOperation startDownload];
 }
 - (IBAction)getAction:(id)sender {
     [self request];

@@ -424,7 +424,7 @@ static NSMutableArray   *requestTasksArray;
     
     retInfo = [self handleStr:retInfo];
     
-    [PEPLogPortManager.shareInstance onEventFromExceptionWithActionID:@"sys_400003" requestURL:requestURL params:paramsStr retCode:retCode retInfo:retInfo beginTimestamp:begin endTimestamp:end object:object fromPos:nil];
+    [PEPLogPortManager.shareInstance onEventFromExceptionWithActionID:@"sys_400003" actionType:nil requestURL:requestURL params:paramsStr retCode:retCode retInfo:retInfo beginTimestamp:begin endTimestamp:end object:object fromPos:nil];
 }
 
 + (NSString *)handleStr:(NSString *)str {

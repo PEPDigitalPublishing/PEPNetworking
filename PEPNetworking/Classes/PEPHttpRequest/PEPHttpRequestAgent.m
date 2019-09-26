@@ -430,7 +430,8 @@ static NSMutableArray   *requestTasksArray;
 + (NSString *)handleStr:(NSString *)str {
     str = [str stringByReplacingOccurrencesOfString:@"\n" withString:@""];
     str = [str stringByReplacingOccurrencesOfString:@" " withString:@""];
-
+    str = [str stringByReplacingOccurrencesOfString:@"~" withString:@""];
+    
     return str;
 }
 

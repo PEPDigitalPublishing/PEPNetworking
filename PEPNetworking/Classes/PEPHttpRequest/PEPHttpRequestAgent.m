@@ -418,9 +418,12 @@ static NSMutableArray   *requestTasksArray;
                             beginTimestamp:(NSTimeInterval)begin
                               endTimestamp:(NSTimeInterval)end
                                     object:(NSString *)object {
-    NSData *data = [NSJSONSerialization dataWithJSONObject:params options:NSJSONWritingPrettyPrinted error:nil];
-    NSString *paramsStr = [NSString.alloc initWithData:data encoding:NSUTF8StringEncoding];
-    paramsStr = [self handleStr:paramsStr];
+    NSString *paramsStr = @"";
+    if (params != nil) {
+        NSData *data = [NSJSONSerialization dataWithJSONObject:params options:NSJSONWritingPrettyPrinted error:nil];
+        paramsStr = [NSString.alloc initWithData:data encoding:NSUTF8StringEncoding];
+        paramsStr = [self handleStr:paramsStr];
+    }
     
     retInfo = [self handleStr:retInfo];
     

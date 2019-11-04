@@ -32,7 +32,7 @@ typedef void(^PEPNetworkStatusChangeBlock)(PEPNetworkStatus status);
 @interface PEPNetworkReachabilityManager : NSObject
 
 @property (nonatomic, assign) PEPNetworkStatus status;
-@property (nonatomic, assign) PEPNetworkStatusChangeBlock statusChangeBlock;
+@property (nonatomic, copy) PEPNetworkStatusChangeBlock statusChangeBlock;
 
 + (instancetype)sharedManager;
 

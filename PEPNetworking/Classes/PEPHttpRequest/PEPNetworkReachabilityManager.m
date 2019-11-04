@@ -53,7 +53,7 @@
     if (_status != status) {
         _status = status;
         
-        if (self.statusChangeBlock) self.statusChangeBlock(status);
+        if (self.statusChangeBlock) { self.statusChangeBlock(status); }
     }
 }
 

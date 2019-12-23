@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
 
     s.name             = 'PEPNetworking'
 
-    s.version          = '0.3.4'
+    s.version          = '0.3.5'
 
     s.summary          = 'A networking framework based on AFNetworking'
 
@@ -27,7 +27,7 @@ Pod::Spec.new do |s|
 
     s.dependency 'AFNetworking', '~> 3.0'
     
-    s.dependency 'PEPBigData'
+#    s.dependency 'PEPBigData'
     
 end
 

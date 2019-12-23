@@ -14,40 +14,25 @@ PODS:
   - AFNetworking/Serialization (3.2.1)
   - AFNetworking/UIKit (3.2.1):
     - AFNetworking/NSURLSession
-  - Aspects (1.4.1)
-  - PEPBigData (0.3.0):
-    - Aspects
-  - PEPNetworking (0.3.5):
+  - PEPNetworking (0.3.4):
     - AFNetworking (~> 3.0)
-    - PEPBigData
 
 DEPENDENCIES:
   - AFNetworking
-  - PEPBigData (from `https://github.com/PEPDigitalPublishing/PEPBigData.git`)
   - PEPNetworking (from `../`)
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  https://github.com/CocoaPods/Specs.git:
     - AFNetworking
-    - Aspects
 
 EXTERNAL SOURCES:
-  PEPBigData:
-    :git: https://github.com/PEPDigitalPublishing/PEPBigData.git
   PEPNetworking:
     :path: "../"
 
-CHECKOUT OPTIONS:
-  PEPBigData:
-    :commit: 19d6eae0ca16af1dfe6b0160d6198fb1836596ff
-    :git: https://github.com/PEPDigitalPublishing/PEPBigData.git
-
 SPEC CHECKSUMS:
   AFNetworking: b6f891fdfaed196b46c7a83cf209e09697b94057
-  Aspects: 7595ba96a6727a58ebcbfc954497fc5d2fdde546
-  PEPBigData: c62369f2ac3f97ee6164270ce650a6a79cac993f
-  PEPNetworking: 3a6b25e7ea918caaa691e8a7172d68134d544f4c
+  PEPNetworking: 57ef8013bde2db71ee0eebce91159a8eed6b28ee
 
-PODFILE CHECKSUM: 99edd72d0f36bd3102dcb6aa66e3a5c9f8d0cad4
+PODFILE CHECKSUM: 340ccf3d65b0482b5fe893c1260162609e66cb43
 
-COCOAPODS: 1.7.5
+COCOAPODS: 1.8.4

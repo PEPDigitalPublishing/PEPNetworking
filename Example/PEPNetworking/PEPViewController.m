@@ -8,6 +8,8 @@
 
 #import "PEPViewController.h"
 #import <PEPNetworking/PEPNetworking.h>
+#import <AssertMacros.h>
+
 
 @interface PEPViewController ()
 @property (weak, nonatomic) IBOutlet UIProgressView *progress;
@@ -16,22 +18,20 @@
 
 @implementation PEPViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+
+    [self authenticationChallenge];
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    [self checkStatus];
-    [self request];
+//    [self checkStatus];
+//    [self request];
 //    [self download];
 //    [self upload];
-    
-    
 }
 
-- (void)checkStatus{
+- (void)checkStatus {
     //开启网络状态监听
     [[PEPNetworkReachabilityManager sharedManager] checkNetworkStatus];
     [PEPNetworkReachabilityManager sharedManager].statusChangeBlock = ^(PEPNetworkStatus status) {
@@ -143,8 +143,116 @@
     
 }
 - (IBAction)postAction:(id)sender {
+    NSString *url = @"https://dianducs.mypep.cn/week/picture.anys";
+        
+    [PEPHttpRequestAgent postWithUrl:url params:nil refreshRequest:false useCache:false progressBlock:nil successBlock:^(id response) {
+        NSLog(@"%@", response[@"list"]);
+
+    } failBlock:^(NSError *error) {
+        NSLog(@"%@", error);
+    }];
+}
+
+- (void)authenticationChallenge {
+    NSString *cerPath = [NSBundle.mainBundle pathForResource:@"domain" ofType:@"cer"];
+    NSData *localCertData = [NSData dataWithContentsOfFile:cerPath];
+    NSArray *localCertificates = @[localCertData];
+    
+    AFHTTPSessionManager *manager = [PEPHttpRequestAgent getAFHTTPSessionManager];
+    [manager setSessionDidReceiveAuthenticationChallengeBlock:^NSURLSessionAuthChallengeDisposition(NSURLSession * _Nonnull session, NSURLAuthenticationChallenge * _Nonnull challenge, NSURLCredential * _Nullable __autoreleasing * _Nullable credential) {
+        SecTrustRef serverTrust = challenge.protectionSpace.serverTrust;
+        NSString *host = challenge.protectionSpace.host;
+
+        NSURLSessionAuthChallengeDisposition disposition = NSURLSessionAuthChallengePerformDefaultHandling;
+        NSURLCredential *cre = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
+        *credential = cre;
+        
+        if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust] == false) {
+            return disposition;
+        }
+
+        // AFN默认的校验方式
+//        if ([[PEPHttpRequestAgent getAFHTTPSessionManager].securityPolicy evaluateServerTrust:serverTrust forDomain:host]) {
+//            disposition = NSURLSessionAuthChallengeUseCredential;
+//        }
+            
+        // 域名校验
+        NSMutableArray *policies = [NSMutableArray array];
+        [policies addObject:(__bridge_transfer id)SecPolicyCreateSSL(true, (__bridge CFStringRef)host)];
+        OSStatus status = SecTrustSetPolicies(serverTrust, (__bridge CFArrayRef)policies);
+    
+        if (status != 0) {
+            NSLog(@"域名校验失败(%d)", (int)status);
+            return NSURLSessionAuthChallengePerformDefaultHandling;
+        }
+
+        BOOL isValid = PEPServerTrustIsValid(serverTrust);
+        
+        if (isValid == false) {
+            NSLog(@"服务端证书无效");
+            disposition = NSURLSessionAuthChallengePerformDefaultHandling;
+        } else {
+            NSMutableArray *pinnedCertificates = [NSMutableArray array];
+            for (NSData *certificateData in localCertificates) {
+                [pinnedCertificates addObject:(__bridge_transfer id)SecCertificateCreateWithData(NULL, (__bridge CFDataRef)certificateData)];
+            }
+            
+            status = SecTrustSetAnchorCertificates(serverTrust, (__bridge CFArrayRef)pinnedCertificates);
+            if (status != 0) {
+                NSLog(@"本地证书存在错误(%d)", (int)status);
+                return NSURLSessionAuthChallengePerformDefaultHandling;
+            }
+
+            NSArray<NSData *> *serverCertificates = PEPCertificateTrustChainForServerTrust(serverTrust);
+            for (NSData *trustChainCertificate in serverCertificates.reverseObjectEnumerator) {
+                if ([localCertificates containsObject:trustChainCertificate]) {
+                    disposition = NSURLSessionAuthChallengeUseCredential;
+                    break;
+                }
+            }
+            
+            if (disposition != NSURLSessionAuthChallengeUseCredential) {
+                NSLog(@"服务端证书与本地证书不匹配");
+            } else {
+                NSLog(@"证书校验通过");
+            }
+        }
+
+        return disposition;
+    }];
+}
 
 
+// 校验服务端证书有效性
+static BOOL PEPServerTrustIsValid(SecTrustRef serverTrust) {
+    BOOL isValid = NO;
+    SecTrustResultType result;
+    __Require_noErr_Quiet(SecTrustEvaluate(serverTrust, &result), _out);
+    
+    /**
+     kSecTrustResultUnspecified 证书有效，但用户并未明确声明信任该证书。
+     kSecTrustResultProceed 证书有效，且用户明确声明信任该证书。
+     */
+    isValid = (result == kSecTrustResultUnspecified || result == kSecTrustResultProceed);
+
+_out:
+    return isValid;
+}
+
+static NSArray * PEPCertificateTrustChainForServerTrust(SecTrustRef serverTrust) {
+    CFIndex certificateCount = SecTrustGetCertificateCount(serverTrust);
+    NSMutableArray *trustChain = [NSMutableArray arrayWithCapacity:(NSUInteger)certificateCount];
+
+    for (CFIndex i = 0; i < certificateCount; i++) {
+        SecCertificateRef certificate = SecTrustGetCertificateAtIndex(serverTrust, i);
+        [trustChain addObject:(__bridge_transfer NSData *)SecCertificateCopyData(certificate)];
+        
+        // 证书摘要信息
+        NSString *subjectSummaryLocal = (__bridge_transfer NSString *)SecCertificateCopySubjectSummary(certificate);
+        NSLog(@"证书摘要：%@", subjectSummaryLocal);
+    }
+
+    return [NSArray arrayWithArray:trustChain];
 }
 
 

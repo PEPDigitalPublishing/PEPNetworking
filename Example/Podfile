@@ -24,6 +24,6 @@ target 'PEPNetworking' do
   
   pod 'AFNetworking'
   
-  pod 'PEPBigData', :git => 'https://github.com/PEPDigitalPublishing/PEPBigData.git'
+#  pod 'PEPBigData', :git => 'https://github.com/PEPDigitalPublishing/PEPBigData.git'
 
 end

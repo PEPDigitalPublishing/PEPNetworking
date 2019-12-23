@@ -10,7 +10,10 @@
 #import "PEPNetworkingCacheManager.h"
 #import "PEPNetworkReachabilityManager.h"
 #import <AFNetworking/AFNetworking.h>
+
+#if __has_include(<PEPBigData/PEPBigData.h>)
 #import <PEPBigData/PEPBigData.h>
+#endif
 
 static NSTimeInterval   requestTimeout = 20.f;
 static NSDictionary     *headers;
@@ -52,46 +55,83 @@ static NSMutableArray   *requestTasksArray;
 
 // MARK: - Properties
 
-+ (AFHTTPSessionManager *)manager {
-    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
++ (void)configRequestSerializerType:(PEPURLRequestSerializerType)requestType responseSerializerType:(PEPURLResponseSerializerType)responseType {
+    AFHTTPSessionManager *manager = [self getAFHTTPSessionManager];
     
-    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-    manager.responseSerializer = [AFJSONResponseSerializer serializer];
-    manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+    AFHTTPRequestSerializer *requestSerializer = nil;
+    AFHTTPResponseSerializer *responseSerializer = nil;
+    
+    switch (requestType) {
+        case PEPURLRequestSerializerTypeHTTP: {
+            requestSerializer = [self getAFHTTPRequestSerializer];
+            break;
+        }
+        case PEPURLRequestSerializerTypeJSON: {
+            
+            break;
+        }
+        case PEPURLRequestSerializerTypePropertyList: {
+            
+            break;
+        }
+    }
+    
+    switch (responseType) {
+        case PEPURLResponseSerializerTypeHTTP: {
+            responseSerializer = [self getAFHTTPResponseSerializer];
+            break;
+        }
+        case PEPURLResponseSerializerTypeJSON: {
+            responseSerializer = [self getAFJSONResponseSerializer];
+            break;
+        }
+        case PEPURLResponseSerializerTypeXMLParser: {
+            
+            break;
+        }
+        case PEPURLResponseSerializerTypeXMLDocument: {
+            
+            break;
+        }
+        case PEPURLResponseSerializerTypePropertyList: {
+            
+            break;
+        }
+    }
+    
+    requestSerializer.timeoutInterval = requestTimeout;
+    for (NSString *key in headers.allKeys) {
+        if (headers[key] != nil) {
+            [requestSerializer setValue:headers[key] forHTTPHeaderField:key];
+        }
+    }
 
-    AFJSONResponseSerializer *serializer = [AFJSONResponseSerializer serializer];
-    [serializer setRemovesKeysWithNullValues: NO];
-    manager.requestSerializer.stringEncoding = NSUTF8StringEncoding;
+    
+    manager.requestSerializer = requestSerializer;
+    manager.responseSerializer = responseSerializer;
+}
+
++ (AFHTTPSessionManager *)manager {
+    AFHTTPSessionManager *manager = [self getAFHTTPSessionManager];
+    
+    manager.requestSerializer = [self getAFHTTPRequestSerializer];
     manager.requestSerializer.timeoutInterval = requestTimeout;
-    //设置请求头
+    
+    // 设置请求头
     for (NSString *key in headers.allKeys) {
         if (headers[key] != nil) {
             [manager.requestSerializer setValue:headers[key] forHTTPHeaderField:key];
         }
     }
-    manager.responseSerializer.acceptableContentTypes = [NSSet setWithArray:@[
-                                                                              @"application/json",
-                                                                              @"text/html",
-                                                                              @"text/json",
-                                                                              @"text/plain",
-                                                                              @"text/javascript",
-                                                                              @"text/xml",
-                                                                              @"image/*",
-                                                                              @"application/octet-stream",
-                                                                              @"application/zip"
-                                                                              ]];
-    //开启网络状态监测
-    [[PEPNetworkReachabilityManager sharedManager] checkNetworkStatus];
-    //检测缓存内存大小
-    [[PEPNetworkingCacheManager sharedManager] clearLRUCache];
+
+    manager.responseSerializer = [self getAFJSONResponseSerializer];
     return manager;
 }
 
 + (AFHTTPSessionManager *)httpResponderManager {
-    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    AFHTTPSessionManager *manager = [self getAFHTTPSessionManager];
     
-    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-    manager.requestSerializer.stringEncoding = NSUTF8StringEncoding;
+    manager.requestSerializer = [self getAFHTTPRequestSerializer];
     manager.requestSerializer.timeoutInterval = requestTimeout;
     
     // 设置请求头
@@ -101,23 +141,7 @@ static NSMutableArray   *requestTasksArray;
         }
     }
     
-    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    manager.requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
-    manager.responseSerializer.acceptableContentTypes = [NSSet setWithArray:@[
-                                                                              @"application/json",
-                                                                              @"text/html",
-                                                                              @"text/json",
-                                                                              @"text/plain",
-                                                                              @"text/javascript",
-                                                                              @"text/xml",
-                                                                              @"image/*",
-                                                                              @"application/octet-stream",
-                                                                              @"application/zip"
-                                                                              ]];
-    //开启网络状态监测
-    [[PEPNetworkReachabilityManager sharedManager] checkNetworkStatus];
-    //检测缓存内存大小
-    [[PEPNetworkingCacheManager sharedManager] clearLRUCache];
+    manager.responseSerializer = [self getAFHTTPResponseSerializer];
     return manager;
 }
 
@@ -183,7 +207,7 @@ static NSMutableArray   *requestTasksArray;
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         
         // 异常响应埋点
-        if (error.code != -999) {   // -999 取消请求，不算异常响应
+        if (error.code != -999 && (error.code >= -2000 && error.code <= -1200)) {   // -999 取消请求，不算异常响应。>=2000 && <= -1200为SSL异常，不上报
             NSString *codeString = [self codeStringFromFailedResponseWithError:error task:task];
             
             [self onEventFromExceptionWithRequestURL:url params:params retCode:codeString retInfo:error.debugDescription beginTimestamp:begin endTimestamp:NSDate.date.timeIntervalSince1970 * 1000 object:nil];
@@ -274,7 +298,7 @@ static NSMutableArray   *requestTasksArray;
      } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
          
          // 异常响应埋点
-         if (error.code != -999) {   // -999 取消请求，不算异常响应
+         if (error.code != -999 && (error.code >= -2000 && error.code <= -1200)) {   // -999 取消请求，不算异常响应。>=2000 && <= -1200为SSL异常，不上报
              NSString *codeString = [self codeStringFromFailedResponseWithError:error task:task];
              
              [self onEventFromExceptionWithRequestURL:url params:params retCode:codeString retInfo:error.debugDescription beginTimestamp:begin endTimestamp:NSDate.date.timeIntervalSince1970 * 1000 object:nil];
@@ -311,6 +335,81 @@ static NSMutableArray   *requestTasksArray;
 
 
 // MARK: - Other
+
++ (AFHTTPSessionManager *)getAFHTTPSessionManager {
+    static AFHTTPSessionManager *manager = nil;
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        manager = [AFHTTPSessionManager manager];
+        
+        // 开启网络状态监测
+        [PEPNetworkReachabilityManager.sharedManager checkNetworkStatus];
+        // 检测缓存内存大小
+        [PEPNetworkingCacheManager.sharedManager clearLRUCache];
+    });
+    
+    return manager;
+}
+
++ (AFHTTPRequestSerializer *)getAFHTTPRequestSerializer {
+    static AFHTTPRequestSerializer *requestSerializer = nil;
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        requestSerializer = [AFHTTPRequestSerializer serializer];
+        requestSerializer.stringEncoding = NSUTF8StringEncoding;
+        requestSerializer.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
+    });
+    
+    return requestSerializer;
+}
+
++ (AFHTTPResponseSerializer *)getAFHTTPResponseSerializer {
+    static AFHTTPResponseSerializer *responseSerializer = nil;
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        responseSerializer = [AFHTTPResponseSerializer serializer];
+        responseSerializer.acceptableContentTypes = [NSSet setWithArray:@[
+                                                                        @"application/json",
+                                                                        @"text/html",
+                                                                        @"text/json",
+                                                                        @"text/plain",
+                                                                        @"text/javascript",
+                                                                        @"text/xml",
+                                                                        @"image/*",
+                                                                        @"application/octet-stream",
+                                                                        @"application/zip"
+                                                                        ]];
+    });
+    
+    return responseSerializer;
+}
+
++ (AFJSONResponseSerializer *)getAFJSONResponseSerializer {
+    static AFJSONResponseSerializer *responseSerializer = nil;
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        responseSerializer = [AFJSONResponseSerializer serializer];
+        responseSerializer.removesKeysWithNullValues = false;
+        responseSerializer.acceptableContentTypes = [NSSet setWithArray:@[
+                                                                        @"application/json",
+                                                                        @"text/html",
+                                                                        @"text/json",
+                                                                        @"text/plain",
+                                                                        @"text/javascript",
+                                                                        @"text/xml",
+                                                                        @"image/*",
+                                                                        @"application/octet-stream",
+                                                                        @"application/zip"
+                                                                        ]];
+    });
+    
+    return responseSerializer;
+}
+
 
 + (void)configHttpHeader:(NSDictionary *)httpHeader{
     headers = httpHeader;
@@ -352,21 +451,44 @@ static NSMutableArray   *requestTasksArray;
 // MARK: - 埋点
 
 + (NSString *)codeStringFromFailedResponseWithError:(NSError *)error task:(NSURLSessionDataTask *)task {
+#if __has_include(<PEPBigData/PEPBigData.h>)
+    return [self _codeStringFromFailedResponseWithError:error task:task];
+#else
+    return @"";
+#endif
+}
+
++ (void)onEventFromExceptionWithTask:(NSURLSessionDataTask *)task params:(NSString *)params response:(id)responseObject beginTimestamp:(NSTimeInterval)begin {
+#if __has_include(<PEPBigData/PEPBigData.h>)
+    [self _onEventFromExceptionWithTask:task params:params response:responseObject beginTimestamp:begin];
+#endif
+}
+
++ (void)onEventFromExceptionWithRequestURL:(NSString *)requestURL params:(NSDictionary *)params retCode:(NSString *)retCode retInfo:(NSString *)retInfo beginTimestamp:(NSTimeInterval)begin endTimestamp:(NSTimeInterval)end object:(NSString *)object {
+#if __has_include(<PEPBigData/PEPBigData.h>)
+    [self _onEventFromExceptionWithRequestURL:requestURL params:params retCode:retCode retInfo:retInfo beginTimestamp:begin endTimestamp:end object:object];
+#endif
+}
+
+
+#if __has_include(<PEPBigData/PEPBigData.h>)
+
++ (NSString *)_codeStringFromFailedResponseWithError:(NSError *)error task:(NSURLSessionDataTask *)task {
     NSInteger errorCode = error.code;
     NSInteger statusCode = 0;
     if ([task.response isKindOfClass:NSHTTPURLResponse.class]) {
         statusCode = [(NSHTTPURLResponse *)task.response statusCode];
     }
     
-    return [self codeStringWithErrorCode:errorCode httpStatusCode:statusCode];
+    return [self _codeStringWithErrorCode:errorCode httpStatusCode:statusCode];
 }
 
 
-+ (NSString *)codeStringWithErrorCode:(NSInteger)errorCode httpStatusCode:(NSInteger)statuCode {
++ (NSString *)_codeStringWithErrorCode:(NSInteger)errorCode httpStatusCode:(NSInteger)statuCode {
     return [NSString stringWithFormat:@"errcode:%ld,http_status_code:%ld", (long)errorCode, (long)statuCode];
 }
 
-+ (NSString *)originURLStringWithTask:(NSURLSessionDataTask *)task {
++ (NSString *)_originURLStringWithTask:(NSURLSessionDataTask *)task {
     NSURL *URL = task.currentRequest.URL;
     NSString *query = [NSString stringWithFormat:@"?%@", URL.query];
     NSString *url = [URL.absoluteString stringByReplacingOccurrencesOfString:query withString:@""];
@@ -374,8 +496,8 @@ static NSMutableArray   *requestTasksArray;
     return url;
 }
 
-+ (void)onEventFromExceptionWithTask:(NSURLSessionDataTask *)task params:(NSString *)params response:(id)responseObject beginTimestamp:(NSTimeInterval)begin {
-    NSString *url = [self originURLStringWithTask:task];
++ (void)_onEventFromExceptionWithTask:(NSURLSessionDataTask *)task params:(NSString *)params response:(id)responseObject beginTimestamp:(NSTimeInterval)begin {
+    NSString *url = [self _originURLStringWithTask:task];
     
     if ([responseObject isKindOfClass:NSDictionary.class] && [[(NSDictionary *)responseObject allKeys] containsObject:@"errcode"]) {
         NSInteger errorCode = [responseObject[@"errcode"] integerValue];
@@ -386,9 +508,9 @@ static NSMutableArray   *requestTasksArray;
                 statusCode = [(NSHTTPURLResponse *)task.response statusCode];
             }
             
-            NSString *codeString = [self codeStringWithErrorCode:errorCode httpStatusCode:statusCode];
+            NSString *codeString = [self _codeStringWithErrorCode:errorCode httpStatusCode:statusCode];
             
-            [self onEventFromExceptionWithRequestURL:url params:params retCode:codeString retInfo:responseObject[@"errmsg"] beginTimestamp:begin endTimestamp:NSDate.date.timeIntervalSince1970 * 1000 object:nil];
+            [self _onEventFromExceptionWithRequestURL:url params:params retCode:codeString retInfo:responseObject[@"errmsg"] beginTimestamp:begin endTimestamp:NSDate.date.timeIntervalSince1970 * 1000 object:nil];
         }
         
     } else if ([responseObject isKindOfClass:NSArray.class] && [(NSArray *)responseObject count] > 0) {
@@ -403,15 +525,15 @@ static NSMutableArray   *requestTasksArray;
                     statusCode = [(NSHTTPURLResponse *)task.response statusCode];
                 }
                 
-                NSString *codeString = [self codeStringWithErrorCode:errorCode httpStatusCode:statusCode];
+                NSString *codeString = [self _codeStringWithErrorCode:errorCode httpStatusCode:statusCode];
                 
-                [self onEventFromExceptionWithRequestURL:url params:params retCode:codeString retInfo:responseObject[@"errmsg"] beginTimestamp:begin endTimestamp:NSDate.date.timeIntervalSince1970 * 1000 object:nil];
+                [self _onEventFromExceptionWithRequestURL:url params:params retCode:codeString retInfo:responseObject[@"errmsg"] beginTimestamp:begin endTimestamp:NSDate.date.timeIntervalSince1970 * 1000 object:nil];
             }
         }
     }
 }
 
-+ (void)onEventFromExceptionWithRequestURL:(NSString *)requestURL
++ (void)_onEventFromExceptionWithRequestURL:(NSString *)requestURL
                                     params:(NSDictionary *)params
                                    retCode:(NSString *)retCode
                                    retInfo:(NSString *)retInfo
@@ -437,6 +559,9 @@ static NSMutableArray   *requestTasksArray;
     
     return str;
 }
+
+#endif
+
 
 
 

@@ -24,6 +24,9 @@
 		71719F9F1E33DC2100824A3D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */; };
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
 		D360379B9CA9A5F7215E9C2C /* libPods-PEPNetworking_Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 693FC0EEE12E5FB613BCDCCC /* libPods-PEPNetworking_Tests.a */; };
+		E93ACDE8239E3F8600899C7B /* domain.cer in Resources */ = {isa = PBXBuildFile; fileRef = E93ACDE7239E3F8500899C7B /* domain.cer */; };
+		E93ACDEA239E455400899C7B /* bing.cer in Resources */ = {isa = PBXBuildFile; fileRef = E93ACDE9239E455300899C7B /* bing.cer */; };
+		E93ACDEC239F439200899C7B /* Charles Proxy.cer in Resources */ = {isa = PBXBuildFile; fileRef = E93ACDEB239F439200899C7B /* Charles Proxy.cer */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +70,9 @@
 		A0CFA67516337790E779B030 /* Pods-PEPNetworking_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PEPNetworking_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PEPNetworking_Tests/Pods-PEPNetworking_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		C4C93A414F11FF097371C592 /* Pods-PEPNetworking_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PEPNetworking_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-PEPNetworking_Example/Pods-PEPNetworking_Example.release.xcconfig"; sourceTree = "<group>"; };
 		DCD3C88B8C890251E236E863 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		E93ACDE7239E3F8500899C7B /* domain.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = domain.cer; sourceTree = "<group>"; };
+		E93ACDE9239E455300899C7B /* bing.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = bing.cer; sourceTree = "<group>"; };
+		E93ACDEB239F439200899C7B /* Charles Proxy.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Charles Proxy.cer"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +144,9 @@
 				6003F5A6195388D20070C39A /* PEPViewController.m */,
 				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
 				71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */,
+				E93ACDE7239E3F8500899C7B /* domain.cer */,
+				E93ACDEB239F439200899C7B /* Charles Proxy.cer */,
+				E93ACDE9239E455300899C7B /* bing.cer */,
 				6003F5A8195388D20070C39A /* Images.xcassets */,
 				6003F594195388D20070C39A /* Supporting Files */,
 			);
@@ -281,7 +290,10 @@
 				873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */,
 				71719F9F1E33DC2100824A3D /* LaunchScreen.storyboard in Resources */,
 				6003F5A9195388D20070C39A /* Images.xcassets in Resources */,
+				E93ACDEC239F439200899C7B /* Charles Proxy.cer in Resources */,
 				6003F598195388D20070C39A /* InfoPlist.strings in Resources */,
+				E93ACDEA239E455400899C7B /* bing.cer in Resources */,
+				E93ACDE8239E3F8600899C7B /* domain.cer in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

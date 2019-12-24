@@ -458,7 +458,7 @@ static NSMutableArray   *requestTasksArray;
 #endif
 }
 
-+ (void)onEventFromExceptionWithTask:(NSURLSessionDataTask *)task params:(NSString *)params response:(id)responseObject beginTimestamp:(NSTimeInterval)begin {
++ (void)onEventFromExceptionWithTask:(NSURLSessionDataTask *)task params:(NSDictionary *)params response:(id)responseObject beginTimestamp:(NSTimeInterval)begin {
 #if __has_include(<PEPBigData/PEPBigData.h>)
     [self _onEventFromExceptionWithTask:task params:params response:responseObject beginTimestamp:begin];
 #endif
@@ -496,7 +496,7 @@ static NSMutableArray   *requestTasksArray;
     return url;
 }
 
-+ (void)_onEventFromExceptionWithTask:(NSURLSessionDataTask *)task params:(NSString *)params response:(id)responseObject beginTimestamp:(NSTimeInterval)begin {
++ (void)_onEventFromExceptionWithTask:(NSURLSessionDataTask *)task params:(NSDictionary *)params response:(id)responseObject beginTimestamp:(NSTimeInterval)begin {
     NSString *url = [self _originURLStringWithTask:task];
     
     if ([responseObject isKindOfClass:NSDictionary.class] && [[(NSDictionary *)responseObject allKeys] containsObject:@"errcode"]) {

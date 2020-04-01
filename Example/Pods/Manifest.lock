@@ -1,21 +1,21 @@
 PODS:
-  - AFNetworking (3.2.1):
-    - AFNetworking/NSURLSession (= 3.2.1)
-    - AFNetworking/Reachability (= 3.2.1)
-    - AFNetworking/Security (= 3.2.1)
-    - AFNetworking/Serialization (= 3.2.1)
-    - AFNetworking/UIKit (= 3.2.1)
-  - AFNetworking/NSURLSession (3.2.1):
+  - AFNetworking (4.0.0):
+    - AFNetworking/NSURLSession (= 4.0.0)
+    - AFNetworking/Reachability (= 4.0.0)
+    - AFNetworking/Security (= 4.0.0)
+    - AFNetworking/Serialization (= 4.0.0)
+    - AFNetworking/UIKit (= 4.0.0)
+  - AFNetworking/NSURLSession (4.0.0):
     - AFNetworking/Reachability
     - AFNetworking/Security
     - AFNetworking/Serialization
-  - AFNetworking/Reachability (3.2.1)
-  - AFNetworking/Security (3.2.1)
-  - AFNetworking/Serialization (3.2.1)
-  - AFNetworking/UIKit (3.2.1):
+  - AFNetworking/Reachability (4.0.0)
+  - AFNetworking/Security (4.0.0)
+  - AFNetworking/Serialization (4.0.0)
+  - AFNetworking/UIKit (4.0.0):
     - AFNetworking/NSURLSession
-  - PEPNetworking (0.4.1):
-    - AFNetworking (>= 3.0)
+  - PEPNetworking (0.4.2):
+    - AFNetworking (~> 4.0.0)
 
 DEPENDENCIES:
   - AFNetworking
@@ -30,9 +30,9 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  AFNetworking: b6f891fdfaed196b46c7a83cf209e09697b94057
-  PEPNetworking: 09a2d0f7a5d4235b06075662eb4f58c020f19df4
+  AFNetworking: d9fdf484a3c723ec3c558a41cc5754c7e845ee77
+  PEPNetworking: 8654ca96d84fa56289b8693b39fa53e39288c0de
 
-PODFILE CHECKSUM: 340ccf3d65b0482b5fe893c1260162609e66cb43
+PODFILE CHECKSUM: 19ad2d4e237e505c470a2df288c8422af3a48125
 
 COCOAPODS: 1.9.1

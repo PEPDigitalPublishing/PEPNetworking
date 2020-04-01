@@ -67,7 +67,7 @@ static NSMutableArray *requestTasksArray;
         }
         return nil;
     }
-    NSURLSessionTask *task = [manager POST:url parameters:params constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+    NSURLSessionTask *task = [manager POST:url parameters:params headers:nil constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
         NSData *data = nil;
         if (model.localData) {
             data = model.localData;
@@ -115,7 +115,7 @@ static NSMutableArray *requestTasksArray;
         return nil;
     }
 
-    NSURLSessionTask *task = [manager POST:url parameters:params constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+    NSURLSessionTask *task = [manager POST:url parameters:params headers:nil constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
         
         [modelArray enumerateObjectsUsingBlock:^(PEPUploadFormModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
             NSData *data = nil;

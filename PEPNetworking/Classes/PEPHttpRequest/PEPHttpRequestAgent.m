@@ -189,7 +189,7 @@ static NSMutableArray   *requestTasksArray;
     }
     
     NSTimeInterval begin = NSDate.date.timeIntervalSince1970 * 1000;
-    task = [manager GET:url parameters:params progress:^(NSProgress * _Nonnull downloadProgress) {
+    task = [manager GET:url parameters:params headers:nil progress:^(NSProgress * _Nonnull downloadProgress) {
         
        if (progressBlock) {
            progressBlock(downloadProgress.completedUnitCount,downloadProgress.totalUnitCount);
@@ -279,7 +279,7 @@ static NSMutableArray   *requestTasksArray;
     
     
     NSTimeInterval begin = NSDate.date.timeIntervalSince1970 * 1000;
-    task = [manager POST:url parameters:params progress:^(NSProgress * _Nonnull uploadProgress) {
+    task = [manager POST:url parameters:params headers:nil progress:^(NSProgress * _Nonnull uploadProgress) {
         if (progressBlock) {
             progressBlock(uploadProgress.completedUnitCount,uploadProgress.completedUnitCount);
         }

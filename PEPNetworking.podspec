@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
 
     s.name             = 'PEPNetworking'
 
-    s.version          = '0.4.1'
+    s.version          = '0.4.2'
 
     s.summary          = 'A networking framework based on AFNetworking'
 
@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
 
     s.frameworks = 'UIKit', 'Foundation'
 
-    s.dependency 'AFNetworking', '~> 3.0'
+    s.dependency 'AFNetworking', '>= 3.0'
         
 end
 

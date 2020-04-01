@@ -14,15 +14,15 @@ PODS:
   - AFNetworking/Serialization (3.2.1)
   - AFNetworking/UIKit (3.2.1):
     - AFNetworking/NSURLSession
-  - PEPNetworking (0.3.4):
-    - AFNetworking (~> 3.0)
+  - PEPNetworking (0.4.1):
+    - AFNetworking (>= 3.0)
 
 DEPENDENCIES:
   - AFNetworking
   - PEPNetworking (from `../`)
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  trunk:
     - AFNetworking
 
 EXTERNAL SOURCES:
@@ -31,8 +31,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   AFNetworking: b6f891fdfaed196b46c7a83cf209e09697b94057
-  PEPNetworking: 57ef8013bde2db71ee0eebce91159a8eed6b28ee
+  PEPNetworking: 09a2d0f7a5d4235b06075662eb4f58c020f19df4
 
 PODFILE CHECKSUM: 340ccf3d65b0482b5fe893c1260162609e66cb43
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.1

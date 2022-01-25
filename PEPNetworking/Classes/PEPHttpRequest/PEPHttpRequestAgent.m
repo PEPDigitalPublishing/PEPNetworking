@@ -341,7 +341,9 @@ static NSMutableArray   *requestTasksArray;
     
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        manager = [AFHTTPSessionManager manager];
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        configuration.connectionProxyDictionary = @{};
+        manager = [[AFHTTPSessionManager alloc]initWithSessionConfiguration:configuration];
         
         // 开启网络状态监测
         [PEPNetworkReachabilityManager.sharedManager checkNetworkStatus];

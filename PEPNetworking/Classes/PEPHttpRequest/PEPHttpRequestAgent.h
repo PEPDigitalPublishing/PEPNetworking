@@ -148,8 +148,36 @@ typedef void(^PEPResponseFailBlock) (NSError *error);
                                   successBlock:(PEPResponseSuccessBlock)successBlock
                                      failBlock:(PEPResponseFailBlock)failBlock;
 
+/**
+ 异步post请求
+ 
+ @param url             请求地址
+ @param params          请求参数
+ @param progressBlock   进度回调
+ @param successBlock    成功回调
+ @param failBlock       失败回调
+ @return                返回请求任务
+ */
++ (NSURLSessionTask *)postWithUrl:(NSString *)url
+                           params:(NSDictionary *)params
+                    progressBlock:(PEPProgressBlock)progressBlock
+                     successBlock:(PEPResponseSuccessBlock)successBlock
+                        failBlock:(PEPResponseFailBlock)failBlock;
+/**
+异步post请求. 使用AFHTTPResponseSerializer类解析
 
-
+@param url             请求地址
+@param params          请求参数
+@param progressBlock   进度回调
+@param successBlock    成功回调
+@param failBlock       失败回调
+@return                返回请求任务
+*/
++ (NSURLSessionTask *)postHTTPResponderWithUrl:(NSString *)url
+                                       params:(NSDictionary *)params
+                                 progressBlock:(PEPProgressBlock)progressBlock
+                                  successBlock:(PEPResponseSuccessBlock)successBlock
+                                     failBlock:(PEPResponseFailBlock)failBlock;
 @end
 
 @interface PEPHttpRequestAgent (cache)

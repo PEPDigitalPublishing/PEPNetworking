@@ -255,6 +255,20 @@ static NSMutableArray   *requestTasksArray;
     return [self postWithUrl:url params:params refreshRequest:refresh useCache:useCache progressBlock:progressBlock successBlock:successBlock failBlock:failBlock isHttpResponder:true];
 }
 
++ (NSURLSessionTask *)postWithUrl:(NSString *)url
+                           params:(NSDictionary *)params
+                    progressBlock:(PEPProgressBlock)progressBlock
+                     successBlock:(PEPResponseSuccessBlock)successBlock
+                        failBlock:(PEPResponseFailBlock)failBlock{
+    return [self postWithUrl:url params:params progressBlock:progressBlock successBlock:successBlock failBlock:failBlock isHttpResponder:false];
+}
++ (NSURLSessionTask *)postHTTPResponderWithUrl:(NSString *)url
+                                       params:(NSDictionary *)params
+                                 progressBlock:(PEPProgressBlock)progressBlock
+                                  successBlock:(PEPResponseSuccessBlock)successBlock
+                                     failBlock:(PEPResponseFailBlock)failBlock{
+    return [self postWithUrl:url params:params progressBlock:progressBlock successBlock:successBlock failBlock:failBlock isHttpResponder:true];
+}
 + (NSURLSessionTask *)postWithUrl:(NSString *)url params:(NSDictionary *)params refreshRequest:(BOOL)refresh useCache:(BOOL)useCache progressBlock:(PEPProgressBlock)progressBlock successBlock:(PEPResponseSuccessBlock)successBlock failBlock:(PEPResponseFailBlock)failBlock isHttpResponder:(BOOL)isHttpResponder {
     __block NSURLSessionTask *task = nil;
     
@@ -332,7 +346,58 @@ static NSMutableArray   *requestTasksArray;
     return nil;
 }
 
-
++ (NSURLSessionTask *)postWithUrl:(NSString *)url params:(NSDictionary *)params progressBlock:(PEPProgressBlock)progressBlock successBlock:(PEPResponseSuccessBlock)successBlock failBlock:(PEPResponseFailBlock)failBlock isHttpResponder:(BOOL)isHttpResponder {
+    __block NSURLSessionTask *task = nil;
+    
+    AFHTTPSessionManager *manager = isHttpResponder ? [self httpResponderManager] : [self manager];
+    
+    PEPNetworkReachabilityManager *reachAbilitymanager = [PEPNetworkReachabilityManager sharedManager];
+    if (reachAbilitymanager.status == PEPNetworkStatusNotReachable ) {
+        //无网络连接且不使用缓存
+        NSError *error = [NSError errorWithDomain:@"com.pepnetwork.networknotreachable" code:-1005 userInfo:@{NSLocalizedDescriptionKey:@"暂无网络连接"}];
+        if (failBlock) {
+            failBlock(error);
+        }
+        return nil;
+    }
+    
+    
+    NSTimeInterval begin = NSDate.date.timeIntervalSince1970 * 1000;
+    task = [manager POST:url parameters:params headers:nil progress:^(NSProgress * _Nonnull uploadProgress) {
+        if (progressBlock) {
+            progressBlock(uploadProgress.completedUnitCount,uploadProgress.completedUnitCount);
+        }
+    } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        // 异常响应埋点
+        [self onEventFromExceptionWithTask:task params:params response:responseObject beginTimestamp:begin];
+        
+        if (successBlock) {
+            successBlock(responseObject);
+        }
+        [[self allTasks] removeObject:task];
+        
+     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+         
+         // 异常响应埋点
+         if (error.code != -999 && (error.code >= -2000 && error.code <= -1200)) {   // -999 取消请求，不算异常响应。>=2000 && <= -1200为SSL异常，不上报
+             NSString *codeString = [self codeStringFromFailedResponseWithError:error task:task];
+             
+             [self onEventFromExceptionWithRequestURL:url params:params retCode:codeString retInfo:error.debugDescription beginTimestamp:begin endTimestamp:NSDate.date.timeIntervalSince1970 * 1000 object:nil];
+         }
+         
+         if (reachAbilitymanager.status == PEPNetworkStatusNotReachable) {
+             // 无网络连接
+             NSError *error = [NSError errorWithDomain:@"com.pepnetwork.networknotreachable" code:-1005 userInfo:@{NSLocalizedDescriptionKey:@"暂无网络连接"}];
+             if (failBlock) {
+                 failBlock(error);
+             }
+         }else if (failBlock) failBlock(error);
+         [[self allTasks] removeObject:task];
+                     
+     }];
+    
+    return nil;
+}
 
 // MARK: - Other
 

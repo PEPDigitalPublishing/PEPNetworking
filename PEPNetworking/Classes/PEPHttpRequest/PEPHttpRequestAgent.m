@@ -206,6 +206,7 @@ static NSMutableArray   *requestTasksArray;
         [[self allTasks] removeObject:task];
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         
+        [PEPHttpRequestAgent handleUploadError:error path:url parameter:params];
         // 异常响应埋点
         if (error.code != -999 && (error.code >= -2000 && error.code <= -1200)) {   // -999 取消请求，不算异常响应。>=2000 && <= -1200为SSL异常，不上报
             NSString *codeString = [self codeStringFromFailedResponseWithError:error task:task];
@@ -311,6 +312,8 @@ static NSMutableArray   *requestTasksArray;
         
      } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
          
+
+         [PEPHttpRequestAgent handleUploadError:error path:url parameter:params];
          // 异常响应埋点
          if (error.code != -999 && (error.code >= -2000 && error.code <= -1200)) {   // -999 取消请求，不算异常响应。>=2000 && <= -1200为SSL异常，不上报
              NSString *codeString = [self codeStringFromFailedResponseWithError:error task:task];
@@ -378,6 +381,7 @@ static NSMutableArray   *requestTasksArray;
         
      } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
          
+         [PEPHttpRequestAgent handleUploadError:error path:url parameter:params];
          // 异常响应埋点
          if (error.code != -999 && (error.code >= -2000 && error.code <= -1200)) {   // -999 取消请求，不算异常响应。>=2000 && <= -1200为SSL异常，不上报
              NSString *codeString = [self codeStringFromFailedResponseWithError:error task:task];
@@ -629,8 +633,36 @@ static NSMutableArray   *requestTasksArray;
 
 #endif
 
++ (void)handleUploadError:(NSError*)error path:(NSString*)path parameter:(NSString*)parameter{
+    
+    Class prHttpUtilClass = NSClassFromString(@"PRHttpUtil");
+    
+    
+    if (prHttpUtilClass) {
+        
 
+        SEL uploadErrorSelector = NSSelectorFromString(@"uploadNetError:path:parameter:");
+        
 
+        if ([prHttpUtilClass respondsToSelector:uploadErrorSelector]) {
+            
+            NSMethodSignature *signature = [prHttpUtilClass methodSignatureForSelector:uploadErrorSelector];
+            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+            [invocation setSelector:uploadErrorSelector];
+            
+            [invocation setTarget:prHttpUtilClass];
+            [invocation setArgument:&error atIndex:2]; // 参数 1
+            [invocation setArgument:&path atIndex:3];  // 参数 2
+            [invocation setArgument:&parameter atIndex:4]; // 参数 3
+            
+            [invocation invoke];
+        } else {
+            NSLog(@"方法 uploadNetError:path:parameter: 未找到");
+        }
+    } else {
+        NSLog(@"PRHttpUtil 类未找到");
+    }
+}
 
 @end
 

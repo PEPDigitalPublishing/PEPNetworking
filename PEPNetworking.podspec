@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
 
     s.name             = 'PEPNetworking'
 
-    s.version          = '0.5.6'
+    s.version          = '0.5.7'
 
     s.summary          = 'A networking framework based on AFNetworking'
 

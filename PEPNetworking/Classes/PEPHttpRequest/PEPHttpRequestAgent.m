@@ -494,10 +494,7 @@ static NSMutableArray   *requestTasksArray;
     __block BOOL isSame = NO;
     
     [[self allTasks] enumerateObjectsUsingBlock:^(NSURLSessionTask * obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (![obj isKindOfClass:[NSURLSessionTask class]]) {
-                return; 
-            }
-        if ([obj.originalRequest isTheSameRequest:task.originalRequest]) {
+        if ([obj isKindOfClass:[NSURLSessionTask class]] && [obj.originalRequest isTheSameRequest:task.originalRequest]) {
             isSame = YES;
             *stop = YES;
         }
@@ -509,7 +506,7 @@ static NSMutableArray   *requestTasksArray;
     __block NSURLSessionTask *oldTask = nil;
     
     [[self allTasks] enumerateObjectsUsingBlock:^(NSURLSessionTask *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([task.originalRequest isTheSameRequest:obj.originalRequest]) {
+        if ([obj isKindOfClass:[NSURLSessionTask class]] && [task.originalRequest isTheSameRequest:obj.originalRequest]) {
             if (obj.state == NSURLSessionTaskStateRunning) {
                 [obj cancel];
                 oldTask = obj;
